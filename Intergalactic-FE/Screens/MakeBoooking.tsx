@@ -1,6 +1,6 @@
 import React from "react";
 import { SafeAreaView, StyleSheet, View, Text } from "react-native";
-import ExtStyles from './../Styles/ExtStyles';
+import ExtStyles from '../Styles/ExtStyles';
 import Header from "../assets/Header";
 
 
