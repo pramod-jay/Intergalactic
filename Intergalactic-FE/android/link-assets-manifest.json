@@ -2,6 +2,14 @@
   "migIndex": 1,
   "data": [
     {
+      "path": "assets/fonts/Cairo-Bold.ttf",
+      "sha1": "23b2b8137a3a75bd05056b67ac28153c9fbef8ad"
+    },
+    {
+      "path": "assets/fonts/Cairo-Regular.ttf",
+      "sha1": "e5438704ef3d865611620c4e65bc663a6b11e599"
+    },
+    {
       "path": "assets/fonts/Poppins-Black.ttf",
       "sha1": "645e04c53c6b5b35bce654a811ebce16af8aa721"
     },
