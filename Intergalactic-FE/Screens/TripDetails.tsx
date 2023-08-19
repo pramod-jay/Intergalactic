@@ -3,14 +3,19 @@ import { SafeAreaView, StyleSheet, View, Text, ScrollView, TextInput, Pressable,
 import ExtStyles from "../Styles/ExtStyles";
 import Header from "../assets/Header";
 import LinearGradient from "react-native-linear-gradient";
-import { RadioButton, Modal, Portal, PaperProvider } from "react-native-paper";
+import { RadioButton } from "react-native-paper";
 import Feather from 'react-native-vector-icons/Feather';
 import DatePicker from 'react-native-date-picker';
 import { SelectList } from 'react-native-dropdown-select-list';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Simple from 'react-native-vector-icons/SimpleLineIcons';
-import { useSafeAreaFrame } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { StacksParams } from "../Navigation/Navigation";
+
 const TripDetails = () => {
+
+    const navigation = useNavigation<NativeStackNavigationProp<StacksParams>>();
 
     const [radioVal, setRadioVal] = useState('one-way');
 
@@ -21,7 +26,6 @@ const TripDetails = () => {
     const [arrDateVisible, setArrDateVisible] = useState(false);
     const [arrDate, setArrDate] = useState(new Date());
     const [arrDetaSelected, setArrDateSelected] = useState(false);
-
 
 
     const departureDest = [
@@ -54,6 +58,7 @@ const TripDetails = () => {
         console.log(arrivalDestination);
         console.log(arrDate);
         console.log(travelMode);
+        navigation.navigate('TravelDetails', { depDate: depDate.getDate() + '/' + Number(depDate.getMonth() + 1) + '/' + depDate.getFullYear() });
     }
 
     return (
@@ -88,7 +93,7 @@ const TripDetails = () => {
                             <Pressable style={{ ...intStyles.element, ...{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' } }} onPress={() => setDepDateVisible(true)}>
                                 <View style={{ width: '90%' }}>
                                     {depDateSelected ?
-                                        <Text style={{ ...intStyles.placeholder, ...{ color: '#FFF' } }}>{depDate.getDate()}/{depDate.getMonth()}/{depDate.getFullYear()}</Text>
+                                        <Text style={{ ...intStyles.placeholder, ...{ color: '#FFF' } }}>{depDate.getDate()}/{depDate.getMonth() + 1}/{depDate.getFullYear()}</Text>
                                         :
                                         <Text style={intStyles.placeholder}>dd / mm / yyyy</Text>
                                     }
