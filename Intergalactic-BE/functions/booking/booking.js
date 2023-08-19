@@ -65,10 +65,6 @@ module.exports= async function success_booking(req,res){
 
         await queryAsync(query6,values6);
 
-        //const text = "Dear customer, Your bookinng (Booking ID: "+bookingID+") is successfull. Thank You";
-
-        //await axios.post(process.env.SMS_URL + "?sendsms&apikey=" + process.env.SMS_Key + "&apitoken=" + process.env.SMS_Token + "&type=sms&from=EzPark&to=" + to + "&text=" + text);
-
         await queryAsync("COMMIT");
 
         return res.json(200);
