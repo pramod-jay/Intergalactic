@@ -13,7 +13,7 @@ module.exports = (req, res)=>{
             res.status(202).send("Error Get Ratings");
         }else{
             console.log("Ratings:",result);
-            res.status(400).json(result);
+            res.status(200).json(result);
         }
     });
 };
