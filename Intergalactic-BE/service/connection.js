@@ -3,13 +3,11 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-
-
 var connection = mysql.createConnection({
-  host: "intergalactic-db.mysql.database.azure.com",
-  user: "intergalacticAdmin",
-  password: "Root@123",
-  database: "intergalactic",
+  host: process.env.DBHost,
+  user: process.env.DBUname,
+  password: process.env.DBPassword,
+  database: process.env.DataBase,
 });
 
 connection.connect(function(err) {

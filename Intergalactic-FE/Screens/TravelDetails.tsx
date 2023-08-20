@@ -1,15 +1,55 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView, StyleSheet, View, Text, Pressable, ScrollView } from 'react-native';
 import ExtStyles from "../Styles/ExtStyles";
 import Header from "../assets/Header";
-import {  NativeStackScreenProps } from "@react-navigation/native-stack";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import LinearGradient from "react-native-linear-gradient";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { StacksParams } from "../Navigation/Navigation";
+import Loader from "../assets/Loader";
+import Error from "../assets/Error";
+import axios from "axios";
+import { API_URL } from "../API/API";
+import moment from 'moment';
 
 type Props = NativeStackScreenProps<StacksParams, "TravelDetails">;
 
 const TravelDetails: React.FC<Props> = (props) => {
+
+    const [isLoading, setIsLoading] = useState(false);
+
+    const [isError, setIsError] = useState(false);
+
+    const [errMessage, setErrMessage] = useState('');
+
+    const showErrorMessage = () => {
+        setIsError(true);
+    };
+
+    const hideErrorMessage = () => {
+        setIsError(false);
+    };
+
+    const [fetchedData, setFetchedData] = useState<any[]>([]);
+
+    useEffect(() => {
+        async function getData() {
+            try {
+                const response = await axios.get(API_URL + 'getShipDetails', {params: {depDate: props.route.params.depDate, shipType: props.route.params.travelMode }})
+                setFetchedData(response.data);
+                setIsLoading(false);
+            } catch (err) {
+                console.log(err);
+                setIsLoading(false);
+                showErrorMessage();
+                setErrMessage('Something went wrong....\nPlease try again...')
+            }
+        };
+
+        setIsLoading(true);
+        getData();
+    }, [])
+
 
     return (
         <SafeAreaView style={ExtStyles.body}>
@@ -43,24 +83,33 @@ const TravelDetails: React.FC<Props> = (props) => {
             </View>
 
             <View style={intStyles.titleConatainer}>
-                <Text style={intStyles.titleTxt}>Space Craft</Text>
+                <Text style={intStyles.titleTxt}>{props.route.params.travelMode}</Text>
             </View>
 
             <ScrollView>
-                {/* Ship cards */}
-                <ShipCard props={props} />
 
-                <ShipCard props={props} />
+                {fetchedData.length == 0 ? <View style={{width: '100%', height: 500, alignItems: 'center', justifyContent: 'center'}}>
+                    <Text style={{fontSize: 12, color: '#FFF', fontWeight: '500'}}>No any {props.route.params.travelMode}</Text>
+                </View> : null}
 
-                <ShipCard props={props} />
+                {fetchedData.map((item, index)=>(
+                    <ShipCard props={props} key={index} shipType={item.shipType} shipName={item.shipName} shipPrice={item.shipPrice} departureTime={item.departureTime} shipCapacity={item.shipCapacity} duration={item.duration} travelID={item.travelID}/>
+                ))}
+                
 
 
             </ScrollView>
+
+            {isLoading ? <Loader /> : null}
+            <Error showModal={isError} hideModal={hideErrorMessage} message={errMessage} />
         </SafeAreaView>
     );
 }
 
-const ShipCard = ({props}:{props: any}) => {
+const ShipCard = ({ props, shipType, shipName, shipPrice, departureTime, shipCapacity, duration, travelID}: { props: any, key: number, shipType: string, shipName: string, shipPrice: string, departureTime: string, shipCapacity: number, duration: string, travelID:string }) => {
+
+    const depTime = moment(departureTime, 'HH:mm:ss');
+    const LandingTime = depTime.add(duration);
 
     const [starColor, setStarColor] = useState({
         star1: '#F6A473',
@@ -72,17 +121,17 @@ const ShipCard = ({props}:{props: any}) => {
 
     const handleBook = () => {
         console.log(props.route.params.depDate);
-        props.navigation.navigate('MakeBooking', {depDate: props.route.params.depDate});
+        props.navigation.navigate('MakeBooking', { travelID: travelID, depDate: props.route.params.depDate });
     }
 
     return (
         <LinearGradient colors={['#282A51', '#4D4D65']} style={intStyles.card}>
             <View style={{ width: '100%', flexDirection: 'row' }}>
                 <View style={{ width: '50%', padding: 10 }}>
-                    <Text style={intStyles.shipName}>Spacecraft 01</Text>
+                    <Text style={intStyles.shipName}>{shipType} {shipName}</Text>
                 </View>
                 <View style={{ width: '50%', padding: 10, alignItems: 'flex-end' }}>
-                    <Text style={intStyles.shipPrice}>$ 3,000,000</Text>
+                    <Text style={intStyles.shipPrice}>$ {Number(shipPrice).toLocaleString()}</Text>
                 </View>
             </View>
 
@@ -91,7 +140,7 @@ const ShipCard = ({props}:{props: any}) => {
                     <Text style={intStyles.shipDetails}>Departure Time</Text>
                 </View>
                 <View style={{ width: '30%' }}>
-                    <Text style={intStyles.detailsValue}>00: 12: 30</Text>
+                    <Text style={intStyles.detailsValue}>{departureTime}</Text>
                 </View>
             </View>
 
@@ -100,7 +149,7 @@ const ShipCard = ({props}:{props: any}) => {
                     <Text style={intStyles.shipDetails}>Landing Time (Mars)</Text>
                 </View>
                 <View style={{ width: '30%' }}>
-                    <Text style={intStyles.detailsValue}>00: 23: 30</Text>
+                    <Text style={intStyles.detailsValue}>{LandingTime.format('HH:mm:ss')}</Text>
                 </View>
             </View>
 
@@ -109,7 +158,7 @@ const ShipCard = ({props}:{props: any}) => {
                     <Text style={intStyles.shipDetails}>Available Seats</Text>
                 </View>
                 <View style={{ width: '30%' }}>
-                    <Text style={intStyles.detailsValue}>90 / 1000</Text>
+                    <Text style={intStyles.detailsValue}>90 / {shipCapacity}</Text>
                 </View>
             </View>
 
@@ -118,7 +167,7 @@ const ShipCard = ({props}:{props: any}) => {
                     <Text style={intStyles.shipDetails}>Duration</Text>
                 </View>
                 <View style={{ width: '30%' }}>
-                    <Text style={intStyles.detailsValue}>22 Hours</Text>
+                    <Text style={intStyles.detailsValue}>{duration}</Text>
                 </View>
             </View>
 

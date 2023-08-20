@@ -8,17 +8,48 @@ import { RadioButton, TextInput } from "react-native-paper";
 import NumericInput from "react-native-numeric-input";
 import Loader from "../assets/Loader";
 import LinearGradient from "react-native-linear-gradient";
-import Component from "react-native-paper/lib/typescript/components/Typography/Text";
+import Error from "../assets/Error";
+import axios from "axios";
+import { API_URL } from "../API/API";
 
 type Props = NativeStackScreenProps<StacksParams, "MakeBooking">;
 
 const MakeBooking: React.FC<Props> = (props) => {
 
+    async function handleBook() {
+        setIsLoading(true);
+        const response = await axios.post(API_URL + 'saveBooking', { passengers: passangers, passportNum: 'P_001', humoCode: '1', travelID: props.route.params.travelID });
+        if (response.data == 200) {
+            setIsLoading(false);
+            props.navigation.navigate('TripDetails');
+        } else {
+            setIsLoading(false);
+            showErrorMessage();
+            setErrMessage('Something went wrong....\nPlease try again...')
+        }
+    }
+
+    const depDate = props.route.params.depDate;
+
     const [radioValTitle, setRadioValTitle] = useState('Mr');
 
     const [radioValGender, setRadioValGender] = useState('Male');
 
-    const depDate = props.route.params.depDate;
+    const [passangers, setPassangers] = useState(1);
+
+
+
+    const [isLoading, setIsLoading] = useState(false);
+    const [isError, setIsError] = useState(false);
+    const [errMessage, setErrMessage] = useState('');
+
+    const showErrorMessage = () => {
+        setIsError(true);
+    };
+
+    const hideErrorMessage = () => {
+        setIsError(false);
+    };
 
     return (
         <SafeAreaView style={ExtStyles.body}>
@@ -46,7 +77,7 @@ const MakeBooking: React.FC<Props> = (props) => {
                 </View>
 
                 <View style={intStyles.elementContainer}>
-                    <Text style={intStyles.elementTxt}>H001</Text>
+                    <Text style={intStyles.elementTxt}>001</Text>
                 </View>
 
                 <View style={{ width: '90%', marginHorizontal: '5%', marginTop: 20, flexDirection: 'row' }}>
@@ -119,8 +150,8 @@ const MakeBooking: React.FC<Props> = (props) => {
                     <View style={intStyles.elementTitleContainer}>
                         <Text style={intStyles.elementTitle}>Number of Passengers</Text>
                     </View>
-                    <View style={{width: '90%', marginHorizontal: '5%'}}>
-                        <NumericInput onChange={value => console.log(value)} minValue={1} maxValue={5} totalWidth={200} totalHeight={59} containerStyle={{ borderWidth: 3, borderColor: '#F6A473', backgroundColor: '#FFF', borderRadius: 5 }} />
+                    <View style={{ width: '90%', marginHorizontal: '5%' }}>
+                        <NumericInput onChange={value => setPassangers(value)} minValue={1} maxValue={5} totalWidth={200} totalHeight={59} containerStyle={{ borderWidth: 3, borderColor: '#F6A473', backgroundColor: '#FFF', borderRadius: 5 }} />
                     </View>
                 </View>
 
@@ -129,19 +160,20 @@ const MakeBooking: React.FC<Props> = (props) => {
                         <Text style={intStyles.elementTitle}>Intergalactic passport Number</Text>
                     </View>
                     <View style={intStyles.elementContainer}>
-                        <Text style={intStyles.elementTxt}>P0002</Text>
+                        <Text style={intStyles.elementTxt}>P_001</Text>
                     </View>
                 </View>
-                
+
                 <View style={intStyles.btnContainer}>
-                    <Pressable onPress={() => console.log('Prssed')}>
-                        <LinearGradient colors={['#F6A473','#4D4D65']} style={intStyles.btn}>
+                    <Pressable onPress={() => handleBook()}>
+                        <LinearGradient colors={['#F6A473', '#4D4D65']} style={intStyles.btn}>
                             <Text style={intStyles.btnTxt}>Book</Text>
                         </LinearGradient>
                     </Pressable>
                 </View>
             </ScrollView>
-            {/* <Loader /> */}
+            {isLoading ? <Loader /> : null}
+            <Error showModal={isError} hideModal={hideErrorMessage} message={errMessage} />
         </SafeAreaView>
     );
 }
