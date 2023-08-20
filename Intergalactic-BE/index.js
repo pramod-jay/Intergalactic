@@ -24,10 +24,9 @@ app.use(
   })
 );
 
-const PORT = 8000;
 
 //Start server using environment variables
-app.listen(PORT, () => {
-  console.log("server started in port : ", PORT);
+app.listen(process.env.PORT, () => {
+  console.log("server started in port : ", process.env.PORT);
 });
 

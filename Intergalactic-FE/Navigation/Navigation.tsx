@@ -8,8 +8,8 @@ import TravelDetails from '../Screens/TravelDetails';
 
 export type StacksParams = {
     TripDetails: undefined;
-    MakeBooking: {depDate: string};
-    TravelDetails: {depDate: string};
+    MakeBooking: {travelID: string, depDate: string};
+    TravelDetails: {depDate: any, depDestintinon: any, arrivalDestination: any, arrDate: any, travelMode: any};
 }
 
 const Stack = createNativeStackNavigator<StacksParams>();
